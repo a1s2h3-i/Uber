@@ -8,7 +8,7 @@ const UserLogIn = () => {
     const [email,setEmail]=useState('');
     const [password,setPassword]=useState('');
     const [userData, setuserData] = useState({})
-    const [user,setuser]=useContext(userDataContext);
+    const {user,setUser}=useContext(userDataContext);
     const navigate=useNavigate();
     const submitHandler=async(e)=>{
         e.preventDefault();
@@ -21,7 +21,8 @@ const UserLogIn = () => {
         if(response.status===200){
             const data=response.data;
             localStorage.setItem('token',data.token)
-            setuser(data.user);
+            localStorage.setItem('user', JSON.stringify(data.user));
+            setUser(data.user);
             navigate('/home');
         }
 
