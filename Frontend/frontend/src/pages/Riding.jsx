@@ -8,14 +8,41 @@ import LiveTracking from "../components/LiveTracking";
 
 
 const Riding=()=>{
+  console.log("oye aa gaye oye");
   const location=useLocation();
   const {ride}=location.state ||{};
+  if (!ride) {
+    const stored = localStorage.getItem("activeRide");
+    if (stored) {
+      ride = JSON.parse(stored);
+    }
+  }
+  console.log("Ride aa gaya",ride);
   const { socket } = useContext(SocketContext)
   const navigate=useNavigate();
-
+ 
   socket.on("ride-ended",()=>{
     navigate("/home");
   })
+
+  console.log("handle payment ke upar aa gaye oye");
+  console.log("pais ekitna hoga oye",ride?.fare);
+ 
+ 
+  const handlePayment = () => {
+    if (!ride?.fare) {
+      console.error("No fare amount found in ride object");
+      return;
+    }
+    
+    navigate("/payment", { 
+     
+      state: { 
+        amount: ride.fare,
+        rideId: ride._id // Optional: pass ride ID for reference
+      } 
+    });
+  };
 
 
     return (
@@ -66,7 +93,7 @@ const Riding=()=>{
           <p>Destination:{ride.destination}</p>
         </div>
       )} */}
-      <button className="w-full bg-green-600 text-white font-semibold p-2 rounded  mt-5">Make a payment</button>
+      <button className="w-full bg-green-600 text-white font-semibold p-2 rounded  mt-5" onClick={handlePayment}>Make a payment</button>
       </div>
     </div>
             </div>

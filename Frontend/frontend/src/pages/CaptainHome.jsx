@@ -57,6 +57,13 @@ console.log( {userId: captain._id,
     updateLocation()
 
     // return () => clearInterval(locationInterval)
+    //
+    socket.on('payment-success', ({ rideId }) => {
+      console.log('Payment success received by captain for ride:', rideId);
+      // You can now allow "Complete Ride" button to show
+      // Update ride state if needed
+      setride((prev) => ({ ...prev, paymentStatus: 'success' }));
+    });
 }, [])
 
 

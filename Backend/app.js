@@ -27,4 +27,6 @@ app.use('/captains',captainRoutes);
 app.use('/maps',mapRoutes);
 app.use('/rides',rideRoutes);
 
+const stripeRoutes = require('./routes/stripe');
+app.use('/api/stripe', stripeRoutes);
 module.exports=app;

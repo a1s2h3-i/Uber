@@ -47,6 +47,18 @@ function initializeSocket(server){
         socket.on('disconnect',()=>{
             console.log(`Client disconnected:${socket.id}`)
         })
+
+        //////////////////////////////////////
+        socket.on('payment-success', async ({ rideId, captainId }) => {
+            const captain = await captainModel.findById(captainId);
+            if (captain && captain.socketId) {
+              sendMessageToSocketId(captain.socketId, {
+                event: 'payment-success',
+                data: { rideId }
+              });
+            }
+          });
+          
     })
 }
 function sendMessageToSocketId(socketId,messageObject){
@@ -58,5 +70,7 @@ function sendMessageToSocketId(socketId,messageObject){
         console.log('Socket.io not initialized');
     }
 }
+
+  
 
 module.exports={initializeSocket,sendMessageToSocketId};

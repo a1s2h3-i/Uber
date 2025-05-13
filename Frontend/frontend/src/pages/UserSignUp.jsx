@@ -11,7 +11,7 @@ const UserSignUp = () => {
     const [lastName, setLastName] = useState('');
     const [userData, setuserData] = useState({})
     const navigate = useNavigate();
-    const [user,setuser]=useContext(userDataContext);
+    const {user,setUser}=useContext(userDataContext);
 
     
     const submitHandler = async(e) => {
@@ -30,7 +30,7 @@ const UserSignUp = () => {
         const response=await axios.post(`${import.meta.env.VITE_BASE_URL}/users/register`,newUser);
 if(response.status===201){
     const data=response.data;
-    setuser(data.user);
+    setUser(data.user);
     localStorage.setItem('token',data.token);
     navigate('/home');
 }

@@ -56,6 +56,7 @@ const Home = () => {
   
     // Optional cleanup
     // return () => socket.off("joined");
+   // localStorage.setItem("activeRide", JSON.stringify(ride));
   
   }, [user]);
 
@@ -66,6 +67,7 @@ const Home = () => {
      setvehicleFound(false);
      setRide(ride);
      setWaitingFordriver(true);
+     localStorage.setItem("activeRide", JSON.stringify(ride));
     // navigate("/riding", { state: { ride } });
    });
   
@@ -74,6 +76,7 @@ const Home = () => {
   socket.on('ride-started', ride => {
     console.log("ride")
     setWaitingFordriver(false)
+    localStorage.setItem("activeRide", JSON.stringify(ride));
     navigate('/riding', { state: { ride } }) // Updated navigate to include ride data
 })
 
