@@ -22,7 +22,7 @@ const Riding=()=>{
   const navigate=useNavigate();
  
   socket.on("ride-ended",()=>{
-    navigate("/home");
+    navigate("/payment/success");
   })
 
   console.log("handle payment ke upar aa gaye oye");

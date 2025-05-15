@@ -29,4 +29,6 @@ app.use('/rides',rideRoutes);
 
 const stripeRoutes = require('./routes/stripe');
 app.use('/api/stripe', stripeRoutes);
+app.use('/reviews', require('./routes/review.routes'));
+
 module.exports=app;
