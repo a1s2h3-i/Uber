@@ -3,11 +3,14 @@ const mapService=require('./maps.service');
 const crypto = require('crypto');
 
 
-async function getFare(pickup,destination){
-    if(!pickup||!destination){
-        throw new Error('pickup and destination are required')
+async function getFare(pickup, destination) {
+    if (!pickup || !destination) {
+        throw new Error('pickup and destination are required');
     }
-    const distanceTime=await mapService.getDistanceTime(pickup,destination);
+
+    const distanceTime = await mapService.getDistanceTime(pickup, destination);
+    const { distance, duration_in_traffic } = distanceTime;
+
     const baseFare = {
         auto: 30,
         car: 50,
@@ -25,15 +28,27 @@ async function getFare(pickup,destination){
         car: 3,
         motorcycle: 1.5
     };
-    console.log(distanceTime);
+
     const fare = {
-        auto: Math.round(baseFare.auto + ((distanceTime.distance.value / 1000) * perKmRate.auto) + ((distanceTime.duration.value / 60) * perMinuteRate.auto)),
-        car: Math.round(baseFare.car + ((distanceTime.distance.value / 1000) * perKmRate.car) + ((distanceTime.duration.value / 60) * perMinuteRate.car)),
-        motorcycle: Math.round(baseFare.motorcycle + ((distanceTime.distance.value / 1000) * perKmRate.motorcycle) + ((distanceTime.duration.value / 60) * perMinuteRate.motorcycle))
+        auto: Math.round(baseFare.auto + ((distance.value / 1000) * perKmRate.auto) + ((duration_in_traffic.value / 60) * perMinuteRate.auto)),
+        car: Math.round(baseFare.car + ((distance.value / 1000) * perKmRate.car) + ((duration_in_traffic.value / 60) * perMinuteRate.car)),
+        motorcycle: Math.round(baseFare.motorcycle + ((distance.value / 1000) * perKmRate.motorcycle) + ((duration_in_traffic.value / 60) * perMinuteRate.motorcycle))
     };
+
+    // Optional: Apply dynamic surge if traffic is bad
+    const normalTime = distanceTime.duration.value;
+    const trafficTime = duration_in_traffic.value;
+
+    if (trafficTime / normalTime > 1.5) {
+        fare.auto = Math.round(fare.auto * 1.25);
+        fare.car = Math.round(fare.car * 1.25);
+        fare.motorcycle = Math.round(fare.motorcycle * 1.25);
+    }
 
     return fare;
 }
+
+
 module.exports.getFare=getFare;
 function getOtp(num) {
     function generateOtp(num) {

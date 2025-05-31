@@ -43,6 +43,15 @@ router.post('/end-ride',
     rideController.endRide
 )
 
+router.get('/captain/rides',
+    authMiddleware.authCaptain,
+    rideController.getCaptainRides
+);
+router.post('/cancel',
+    authMiddleware.optionalAuth, // Accepts user or captain
+    body('rideId').isMongoId().withMessage('Invalid ride id'),
+    rideController.cancelRide
+);
 
 
 module.exports=router;

@@ -59,6 +59,23 @@ const Home = () => {
    // localStorage.setItem("activeRide", JSON.stringify(ride));
   
   }, [user]);
+  useEffect(() => {
+    if (pickup && destination && vehicleType) {
+      axios.get(`${import.meta.env.VITE_BASE_URL}/rides/get-fare`, {
+        params: { pickup, destination, vehicleType },
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
+      })
+      .then(response => {
+        setFare(response.data);
+      })
+      .catch(error => {
+        console.error("Failed to fetch fare:", error);
+      });
+    }
+  }, [pickup, destination, vehicleType]);
+  
 
 
   ///////////////////////////////////
@@ -201,9 +218,11 @@ const handleDestinationChange = async (e) => {
       async function findTrip() {
         setVehiclePanelOpen(true)
         setpanelOpen(false)
+        const params = { pickup, destination };
+  if(vehicleType) params.vehicleType = vehicleType;
 
         const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/rides/get-fare`, {
-            params: { pickup, destination },
+            params,
             headers: {
                 Authorization: `Bearer ${localStorage.getItem('token')}`
             }
@@ -310,7 +329,7 @@ const handleDestinationChange = async (e) => {
     </div>
     <div  ref={ConfirmedRidePanelRef} className='fixed z-10 bottom-0  p-5 w-full max-h-[70%] bg-white overflow-y-auto translate-y-full px-3 py-6 pt-12 '>
 
-     <ConfirmedRide  pickup={pickup}  destination={destination} fare={fare} vehicleType={vehicleType} createRide={ createRide} setConfirmedRidePanel={setConfirmedRidePanel} setvehicleFound={setvehicleFound}/>
+     <ConfirmedRide  pickup={pickup}  destination={destination} fare={fare} vehicleType={vehicleType} createRide={ createRide} setConfirmedRidePanel={setConfirmedRidePanel} setvehicleFound={setvehicleFound} setVehiclePanelOpen={setVehiclePanelOpen}/>
     </div>
 
     <div  ref={vehicleFoundRef} className='fixed w-full z-10 bottom-0 translate-y-full bg-white px-3 py-6 pt-12 '>

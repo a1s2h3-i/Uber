@@ -123,13 +123,20 @@ setconfirmRidePopupPanel(true)
           },[confirmRidePopupPanel])
   return (
     <div className="h-screen">
-           <div className='fixed p-3 top-0 flex items-center justify-between '>
-            <img className='w-15' src="https://upload.wikimedia.org/wikipedia/commons/c/cc/Uber_logo_2018.png"/>
-             <Link to="/captain-home" className="fixed right-2 top-2 h-10 w-10 bg-white flex items-center justify-center">
-             <i className='text-lg font-medium ri-logout-box-r-line'></i>
-                        </Link>
-          
-           </div>
+          <div className='fixed p-3 top-0 left-0 right-0 flex items-center justify-between bg-white z-50 shadow-md'>
+  <img className='w-20' src="https://upload.wikimedia.org/wikipedia/commons/c/cc/Uber_logo_2018.png" />
+
+  <div className="flex gap-3 items-center">
+    <Link to="/captain-dashboard" className="bg-black text-white px-4 py-2 rounded hover:bg-gray-800 text-sm">
+      Dashboard
+    </Link>
+
+    <Link to="/captain-home" className="h-10 w-10 bg-gray-200 flex items-center justify-center rounded-full">
+      <i className='text-lg font-medium ri-logout-box-r-line'></i>
+    </Link>
+  </div>
+</div>
+
 
            <div className="h-1/2">
             <img className="h-full w-full object-cover" src="https://miro.medium.com/v2/resize:fit:1400/0*gwMx05pqII5hbfmX.gif"/>

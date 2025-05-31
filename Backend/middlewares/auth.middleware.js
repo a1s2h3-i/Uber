@@ -61,3 +61,14 @@ module.exports.authCaptain = async (req, res, next) => {
         res.status(401).json({ message: 'Unauthorized' });
     }
 }
+
+// Optional middleware that allows either user or captain to access
+module.exports.optionalAuth = (req, res, next) => {
+    // Import authUser and authCaptain from module.exports directly
+    const { authUser, authCaptain } = require('./auth.middleware'); // Adjust path if needed
+
+    authUser(req, res, (err) => {
+        if (!err) return next(); // User authenticated, proceed
+        authCaptain(req, res, next); // Try captain authentication
+    });
+};

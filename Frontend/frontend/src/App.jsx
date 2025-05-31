@@ -14,7 +14,7 @@ import Riding from './pages/Riding'
 import CaptainRiding from './pages/CaptainRiding'
 import PaymentPage from './components/PaymentForm'
 import PaymentSuccess from './components/PaymentSuccess'
-
+import CaptainDashboard from './components/CaptainDashboard'
 const App = () => {
   return (
     <div>
@@ -26,6 +26,7 @@ const App = () => {
         <Route path='/riding' element={<Riding/>}/>
         <Route path='/captain-login' element={<CaptainLogin/>}/>
         <Route path='/captain-riding' element={<CaptainRiding/>}/>
+        <Route path="/captain-dashboard" element={<CaptainDashboard />} />
         <Route path='/captain-signup' element={<CaptainSignUp/>}/>
         <Route path="/payment/success" element={<PaymentSuccess />} />
         <Route path='/home' element={<UserProtectWrapper>

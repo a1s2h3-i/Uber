@@ -1,24 +1,26 @@
 import React, { useState, useRef, useEffect, useContext } from 'react';
-import { Link } from 'react-router-dom';
-import { useNavigate } from 'react-router-dom';
-import { SocketContext } from '../context/SocketContext'; // Import socket context
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { SocketContext } from '../context/SocketContext';
 import FinishRide from '../components/FinishRide';
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
-import { useLocation } from 'react-router-dom';
 import LiveTracking from '../components/LiveTracking';
 import axios from 'axios';
 
 const CaptainRiding = () => {
   const [finishRidePanel, setFinishRidePanel] = useState(false);
-  const [paymentReceived, setPaymentReceived] = useState(false); // State for the payment success popup
+  const [paymentReceived, setPaymentReceived] = useState(false);
   const finishRidePanelRef = useRef(null);
   const location = useLocation();
   const rideData = location.state?.ride;
-  const { socket } = useContext(SocketContext); // Get socket from context
+  const { socket } = useContext(SocketContext);
   const navigate = useNavigate();
 
-  // GSAP animation for the finish ride panel
+  // Extract coordinates safely from rideData
+  const pickupCoords = rideData?.pickupLocation || null;
+  const destinationCoords = rideData?.destinationLocation || null;
+
+  // GSAP animation for finish ride panel
   useGSAP(() => {
     if (finishRidePanel) {
       gsap.to(finishRidePanelRef.current, {
@@ -31,19 +33,19 @@ const CaptainRiding = () => {
     }
   }, [finishRidePanel]);
 
-  // Listen for the payment-success event from the socket
+  // Listen for payment-success socket event
   useEffect(() => {
     socket.on('payment-success', ({ rideId }) => {
       console.log('✅ Payment received for ride:', rideId);
-      setPaymentReceived(true); // Trigger the payment success popup
+      setPaymentReceived(true);
     });
 
     return () => {
-      socket.off('payment-success'); // Clean up the listener when component unmounts
+      socket.off('payment-success');
     };
   }, [socket]);
 
-  // Handle the ride completion after payment confirmation
+  // Complete ride API call
   const completeRideHandler = async () => {
     try {
       const response = await axios.post(
@@ -55,23 +57,22 @@ const CaptainRiding = () => {
           },
         }
       );
-  
+
       if (response.status === 200) {
         alert('✅ Ride completed successfully!');
-        setPaymentReceived(false); // Close the payment success popup
+        setPaymentReceived(false);
         navigate('/captain-home');
       }
     } catch (error) {
       console.error('Error in completeRideHandler:', error);
       alert('❌ Failed to complete the ride.');
-      // Log response error details
       if (error.response) {
         console.error('Error response:', error.response);
         alert(`Server Error: ${error.response.status} - ${error.response.data.message}`);
       }
     }
   };
-  
+
   return (
     <div className="h-screen">
       {/* Header with logout */}
@@ -83,10 +84,14 @@ const CaptainRiding = () => {
 
       {/* Main content */}
       <div className="h-4/5">
-        <LiveTracking />
+        {pickupCoords && destinationCoords ? (
+          <LiveTracking pickup={pickupCoords} destination={destinationCoords} />
+        ) : (
+          <p className="text-center mt-20">Loading map data...</p>
+        )}
       </div>
 
-      {/* Button to trigger the finish ride panel */}
+      {/* Button to trigger finish ride panel */}
       <div className="h-4/5 p-6 bg-yellow-400 relative" onClick={() => setFinishRidePanel(true)}>
         <h5 className="p-3 text-center w-full left-4 top-2 absolute w-[90%]">
           <i className="ri-arrow-down-wide-line"></i>
@@ -109,10 +114,7 @@ const CaptainRiding = () => {
           <div className="bg-white p-6 rounded-lg shadow-lg text-center">
             <h2 className="text-xl font-semibold mb-4 text-green-600">Payment Completed</h2>
             <p className="mb-4">The user has completed the payment. You can now finish the ride.</p>
-            <button
-              className="bg-black text-white px-4 py-2 rounded"
-              onClick={completeRideHandler}
-            >
+            <button className="bg-black text-white px-4 py-2 rounded" onClick={completeRideHandler}>
               Complete Ride
             </button>
           </div>

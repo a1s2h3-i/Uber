@@ -1,10 +1,45 @@
-import React from 'react'
+import React, { useContext, useEffect } from 'react'
+import { SocketContext } from '../context/SocketContext';
+import { useNavigate } from 'react-router-dom';
 
 const WaitingForDriver = (props) => {
+  const {socket}=useContext(SocketContext);
+  const navigate=useNavigate();
+  useEffect(()=>{
+    if(!socket) return;
+
+    const handleRideCancelled=(data)=>{
+      if(data.rideId===props.ride._id){
+        props.setWaitingFordriver(false);
+        navigate('/home');
+      }
+    }
+    socket.on('ride-cancelled',handleRideCancelled);
+
+    return ()=>{
+      socket.off('ride-cancelled',handleRideCancelled);
+    };
+  },[socket,props.ride?._id]);
+
+  const handleCancelRide=()=>{
+    if(!socket){
+      console.log("not connected");
+      return;
+    }
+    socket.emit('cancel-ride', {
+      rideId: props.ride?._id,
+      cancelledBy: 'user'
+    });
+    
+    props.setWaitingFordriver(false);
+    //yahan navigate use kar sakte
+
+  }
+
   return (
     <div>
           <h5 className='p-3 text-center  w-full left-4 top-2 absolute w-[90%] ' onClick={()=>{
-        props.WaitingForDriver(false);
+        props.setWaitingFordriver(false);
       }}><i className="ri-arrow-down-wide-line"></i></h5>
       
       <div className='flex items-center justify-between'>
@@ -40,6 +75,12 @@ const WaitingForDriver = (props) => {
          </div>
       </div>
       <button className='w-full bg-green-600 text-white font-semibold p-2 rounded  mt-5'onClick={()=>{props.setvehicleFound(true)}}>Confirm</button>
+      <button 
+          className='w-full bg-red-500 text-white font-semibold p-2 rounded mt-3'
+          onClick={handleCancelRide}
+        >
+          Cancel Ride
+        </button>
       </div>
     </div>
   )
